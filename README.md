@@ -1,109 +1,159 @@
 
-# UnrealEnginePython
+# UnrealEnginePython (언리얼 엔진 파이썬)
 Embed Python in Unreal Engine 4
+언리얼 엔진4 파이썬 임베딩
 
 Teaser (by Kite & Lightning): https://twitter.com/KNLstudio/status/932657812466843648
+티져
 
 Fixing Mixamo RootMotion tuturial: https://github.com/20tab/UnrealEnginePython/blob/master/tutorials/FixingMixamoRootMotionWithPython.md
+믹사모 루트 모션 튜토리얼 수정
 
 Funny snippets for working with StaticMesh and SkeletalMesh assets: https://github.com/20tab/UnrealEnginePython/blob/master/tutorials/SnippetsForStaticAndSkeletalMeshes.md
+스태틱 메쉬와 스켈레탈 메쉬 애셋 작업 관련 재밌는 스니펫 모음
 
 More tutorials: https://github.com/20tab/UnrealEnginePython/tree/master/tutorials
+추가 튜토리얼
 
-# How and Why ?
+# How and Why ? (어떻게? 왜?)
 
 This is a plugin embedding a whole Python VM (versions 3.x [the default and suggested one] and 2.7) In Unreal Engine 4 (both the editor and runtime).
+언리얼 엔진 파이썬은 언리얼 엔진4 에 파이썬 VM을 완전히 임베딩한 (에디터 및 런타임) 플러그인입니다. (기본적으로 파이썬 3.x 지원 및 추천하며 2.7 도 지원됩니다.)
 
 The Python VM tries to give easy access to all of the UE4 internal api + its reflection system. This means you can use the plugin to write other plugins, to automate tasks, to write unit tests and to implement gameplay elements.
+파이썬 VM 은 언리얼 내부 API 와 리플렉션 시스템 전체에 쉽게 접근할 수 있는 방법을 제공하는 것을 목표로 하고 있어, 플러그인 제작, 업무 자동화, 유닛 테스트, 게임 플레이 요소 구현에 사용될 수 있습니다.
 
 It is not meant as a way to avoid blueprints or c++ but as a good companion to them (albeit reducing the amount of c++ required for coding a game could be an interesting thing ;). If your development pipeline is already python-based (Maya, Blender, ...), this plugin could easily help you in integrating unreal into it.
+블루프린트나 C++ 를 완전히 대체하기보다는 (C++ 코딩을 줄이는데) 좋은 동반자 역할을 할 것입니다. 현재 개발 파이프 라인에 이미 파이썬 기반(마야, 블렌더, ...)이라면 언리얼 엔진 통합에 큰 도움이 될 것입니다. 
 
 If you want to have an idea of what the plugin can do, jump here: https://github.com/20tab/UnrealEnginePython/blob/master/tutorials/YourFirstAutomatedPipeline.md
+플러그인으로 할 수 있는 것들에 대해 할 수 싶다면 다음 링크를 참고해주시기 바랍니다.
 
 In addition to this, the plugin automatically adds an actor class (PyActor), a pawn class (PyPawn), a character class (PyCharacter) and a component class (PythonComponent) for "gentle" integration of python in your games.
+이외에도 액터(PyActor), 폰(PyPawn), 캐릭터(PyCharacter), 컴포넌트(PythonComponent)등이 추가되어 있어 게임내 파이썬을 "젠틀하게" 통합시킬 수 있스니다. 
 
 In the spirit of automating tasks, even wrappers for third party libraries used by UE4 are exposed in a 'pythonic' way. As an example the FbxSdk is exposed to allow low-level interaction with Fbx files. This is an example extracting animation curves: https://github.com/20tab/UnrealEnginePython/blob/master/examples/fbx_curves_extractor.py
+업무 자동화 측면에서도 써드 파티 라이브러리 랩퍼들을 '파이썬스러운' 방법으로 사용할 수 있습니다. 예를 들어 Fbx 파일들이 저수준 통합을 위해 FbxSdk 가 제공됩니다. 다음은 애니메이션 커브를 뽑아내는 예제입니다.  
 
 Another funny feature (well, a side effect ;) is that you can change your python code even after the project has been packaged. You can potentially build a completely new game from an already packaged one.
+(사실 사이드 이펙트에 가깝겠습니다만) 재밌는 장점 중 하나는 프로젝트를 패키징한 이후에도 파이썬 코드를 변경할 수 있다는 점입니다. 이점을 이용하면 이미 패키지된 게임에서 완전히 새로운 게임을 만들 수 있습니다.
 
 Once the plugin is installed and enabled, you get access to the 'PythonConsole' item in the 'Development Menu', you can use it to trigger python commands directly from the editor. There is even an experimental Editor/IDE included, you can run it from the Window/Layout/Python Editor menu item.
+플러그인을 설치 후 활성화시키면, '개발 메뉴'에서 '파이썬 콘솔'을 사용할 수 있습니다. 여기에서는 에디터에서 파이썬 커맨드를 실행할 수 있습니다. 이것은 실험적으로 에디터/IDE 에 포함되어 있으며 윈도우> 레이아웃> 파이썬 에디터 메뉴에서 실행할 수 있습니다.
 
 All of the exposed engine features are under the 'unreal_engine' virtual module (it is completely coded in c into the plugin, so do not expect to run 'import unreal_engine' from a standard python shell)
+엔진 기능들은 가상 모듈 `unreal_engine` 을 통해 접근 할 수 있습니다. (플러그인내 c 로 구현된 것이므로, 스탠다드 파이썬 쉘에서는 임포트할 수 없습니다.)
 
 The currently supported Unreal Engine versions are 4.12, 4.13, 4.14, 4.15, 4.16, 4.17, 4.18, 4.19, 4.20, 4.21 and 4.22
+현재 지원되는 파이썬 엔진은 다음과 같습니다: 4.12, 4.13, 4.14, 4.15, 4.15, 4.17, 4.18, 4.19, 4.20, 4.21, 4.22
 
 We support official python.org releases as well as IntelPython and Anaconda distributions.
+공식 파이썬 릴리즈(인텔 파이썬, 아나콘다 배포판 포함)을 지원하고 있습니다.
 
 Note: this plugin has nothing to do with the experimental 'PythonScriptPlugin' included in Unreal Engine >= 4.19. We aim at full integration with engine and editor (included the Slate api, check here: https://github.com/20tab/UnrealEnginePython/blob/master/docs/Slate_API.md), as well as support for the vast majority of python features like asyncio, coroutines, generators, threads and third party modules.
+참고: 언리얼 엔진 파이썬 플러그인은 언리얼 엔진4.19 부터 포함된 파이썬 스크립트 플러그인과는 관련이 없습니다. 우리는 엔진과 (슬레이트 API를 포함한) 에디터의 완벽한 통합과 파이썬의 중요 기능(비동기 io, 코루틴, 제너레이터, 쓰레드, 써드파티 모듈)이 지원을 목표로 하고 있습니다.
 
-# Binary installation on Windows (64 bit)
+# Binary installation on Windows (64 bit) 윈도우(64비트) 바이너리 설치 
 
 Check in the releases page (https://github.com/20tab/UnrealEnginePython/releases) if there is a binary version that matches your configuration (otherwise open an issue asking us for it [please specify the python version too]) and download it.
+릴리즈 페이지에서 원하는 바이너리 버전을 다운로드 받으시기 바랍니다. (적합한 바이너리가 없다면 파이썬 버전을 명시해 문의 부탁드립니다.)
 
 Binary releases are in two forms: standard and embedded. Standard uses the python installation of your system, so ensure the python installation directory is in your system PATH environment variable (otherwise you will get an error while loading your project). Embedded releases include an embedded python installation so you do not need to have python in your system.
+바이너리는 스탠다드와 임베디드 2가지 형태로 릴리즈됩니다. 스탠다드 릴리즈는 시스템에 설치된 파이썬을 사용하므로 파이썬 설치 디렉토리가 시스템 환경 변수 PATH 에 존재하는지 확인이 필요합니다. (파이썬이 설치되지 않았다면 프로젝트 로딩시 에러가 발생할겁니다.) 임베디드 릴리즈는 임베디드 파이썬이 포함되어있어 시스템에 파이썬이 없어도 사용할 수 있습니다.
 
 Create (if it does not already exist) a Plugins directory in your project root directory (at the same level of Content/ and the .uproject file) and unzip the plugin into it. If your project is named FooBar you will end with FooBar/Plugins/UnrealEnginePython.
+프로젝트 루트 디렉토리에 플러그인 디렉토리가 필요합니다. 플러그인 디렉토리가 없다면 프로젝트 파일(.uproject)나 Content 폴더와 같은 위치이에 Plugins 디렉토리를 만들면 됩니다. 프로젝트 이름이 FooBar 라면 FooBar/Plugins/UnrealEnginePython 라는 경로를 갖게 됩니다.
 
 Open your project and go to the Edit/Plugins menu. Go to the bottom and under "Project/Scripting Languages" enable UnrealEnginePython.
+프로젝트를 열고, 편집 > 플러그인 메뉴로 이동합니다. 플러그인 다이얼로그 하단에 "프로젝트 > Scripting Languages" 에서 UnrealEnginePython 을 활성화시켜주세요.
 
 Restart your project and you should see the PythonConsole under the "Window/Developer Tools" menu
+프로젝트를 재시작하면 "윈도우 > 개발자 도구" 메뉴에서 파이썬 콘솔을 찾으실 수 있을 겁니다.
 
 Binary releases are mainly useful for editor scripting, if you want to package your project for distribution and you need the python runtime, you need a source release (see below).
+바이너리 릴리즈는 주로 에디터 스크립팅을 하는데 유용합니다. 배포용 패키지에서 파이썬 런타임이 필요하다면 아래 나오는 소스 릴리즈를 사용하셔야 합니다.
 
 If instead, you want to package your project without python, just remember to change the UnrealEnginePython.uplugin to have this line: https://github.com/20tab/UnrealEnginePython/blob/master/UnrealEnginePython.uplugin#L20 set as "Editor" instead of "Runtime"
+대신 파이썬 없이 프로젝트를 패키지하려면 UnrealEnginePython.uplugin 에서 Runtime 대신 Editor 로 설정해주셔야 합니다.
 
-# Installation from sources on Windows (64 bit)
+# Installation from sources on Windows (64 bit) 윈도우(64비트) 소스 설치
 
 Currently python3.6, python3.5 and python2.7 are supported. It is highly suggested to have a python system wide installation (by default the official python distributions are installed in user's home directory) with the PATH environment variable including it (if you change the PATH variable remember to reboot the system before running the build procedure, this is not strictly required but will ensure the PATH is updated). If the PATH variable does not contain the path of your python installation you will see a warning in the build log/output.
+현재는 파이썬 3.6, 3.5, 2.7 버전을 지원하고 있습니다. 소스 버전 사용시에는 파이썬을 시스템에 설치하는 것을 추천합니다. 파이썬 공식 배포판은 사용자의 홈 디렉토리에 설치되며, 환경 변수 PATH 에 설치 경로를 추가해줍니다. (PATH 변수가 수정되고 나면 시스템을 리부팅하는 것을 추천하지만, 환경 변수 갱신 방법을 알고 계시다면 상관없습니다.) 만약 PATH 변수에 파이썬 설치 경로가 포함되어있지 않다면 빌드 로그/출력에 경고가 나오게 됩니다.
 
 Download a source official release or simply clone the repository for latest updates:
+공식 소스 릴리즈를 다운로드하거나 저장소를 클론해주세요.
 
 ```sh
 git clone https://github.com/20tab/UnrealEnginePython
 ```
 
 By default the build procedure will try to discover your python installation looking at hardcoded known paths. If you want to specify a custom python installation (or the autodetection simply fails) you can change it in the Source/UnrealEnginePython/UnrealEnginePython.Build.cs file at this line: https://github.com/20tab/UnrealEnginePython/blob/master/Source/UnrealEnginePython/UnrealEnginePython.Build.cs#L10
+현재 구현된 빌드 절차에서는 하드코딩된 기존 파이썬 경로에서 파이썬 설치 경로를 찾습니다. 파이썬을 다른 곳에 설치하셨다면 플러그인 빌드 설정(UnrealEnginePython.Build.cs)를 수정하셔야 합니다.
 
 Note: ensure you have a 64bit python installation
+참고: 반드시 64비트 파이썬이 설치되어있어야 합니다.
 
 
 choose a project you want to install the plugin into, open the file explorer (you can do it from the epic launcher too) and:
+플러그인을 설치할 프로젝트를 골랐다면, 탐색기를 오픈합니다. (에픽 런처에서도 가능합니다.)
 
 * create a Plugins/ directory (if it does not exist) in your project and copy the directory UnrealEnginePython into it
+* 프로젝트에 Plugins/ 디렉토리를 생성한다음, UnrealEnginePython 을 복사해 넣습니다.
 * from the file explorer right click on the project main file and choose 'generate visual studio project files'
+* 탐색기에서 프로젝트 파일을 선택 후 우클릭 한다음 "Generate Visual Studio Project Files"를 선택합니다.
 * open visual studio, you should now see Plugins/UnrealEnginePython in your solution explorer
+* 비주얼 스튜디오를 연 다음 솔루션 탐색기에서 Plugins/UnrealEnginePython 을 확인합니다.
 * run the compilation from visual studio
+* 비주얼 스튜디오 컴파일을 시작합니다.
 * once the compilation ends, double check the python libraries can be found by the plugin (they must be in the system PATH like previously described, or brutally copy them in the Binaries/Win64 directory of the just built plugin)
+* 컴파일이 끝나면 플러그인에서 파이썬 라이브러리를 찾을 수 있는지 다시 한번 확인합니다. (환경 변수 PATH 에 정의되어 있거나 Binaries/Win64 디렉토리에 복사해놓으면 됩니다.)
 * now you can re-run the unreal engine editor
+* 언리얼 엔진 에디터를 재실행합니다.
 
 If all goes well, you will see 'Python Console' in the "Window/Developer Tools" menu
+성공했다면 "윈도우>개발자 도구" 메뉴에서 'Python Console' 이 보이실겁니다.
 
 If you want to package your project (it is required only if you need to have a python VM at runtime, read: your game logic is programmed in python) ensure the Content/Scripts/ue_site.py file is in your project (it can be empty). At the end of the build procedure ensure to copy all of your required python scripts in the final directory. Remember that unless you add an embedded python in your final build, the final users of your project will require python installed in his/her system.
+(게임 로직이 파이썬으로 코딩되어 있어서) 프로젝트 패키지 런타임에서도 사용하려면 프로젝트내 `Content/Scripts/ue_site.py` 파일이 필요합니다. 빌드 마지막 단계에 임베디드 파이썬을 추가해놓지 않으면 사용자 시스템에서 파이썬을 요구하게 된다는 점을 기억해두시기 바랍니다.
 
 If you want to package without python, just remember to change the UnrealEnginePython.uplugin to have this line: https://github.com/20tab/UnrealEnginePython/blob/master/UnrealEnginePython.uplugin#L20 set as "Editor" instead of "Runtime"
+파이썬 없이 패키징 하려면 플러그인 파일(UnrealEnginePython.uplugin)에서Runtime 을 Editor 로 변경해야 합니다.
 
-# Binaries installation on MaxOSX
+# Binaries installation on MaxOSX (macOS 바이너리 인스톨)
 
 Check in the releases page (https://github.com/20tab/UnrealEnginePython/releases) if there is a binary version that matches your configuration (otherwise open an issue asking us for it [please specify the python version too]) and download it.
+릴리즈 페이지에서 원하는 바이너리 버전을 다운로드 받으시기 바랍니다. (적합한 바이너리가 없다면 파이썬 버전을 명시해 문의 부탁드립니다.)
 
 Binary releases for MacOSX expects an official python installation (the packages you get from python.org).
+macOS 용 바이너리 릴리즈는 (python.org 에서 받을 수 있는) 파이썬 공식 배포판을 기준으로 설명합니다.
 
 Create (if it does not already exist) a Plugins directory in your project root directory (at the same level of Content/ and the .uproject file) and unzip the plugin into it. If your project is named FooBar you will end with FooBar/Plugins/UnrealEnginePython.
+프로젝트 루트 디렉토리에 플러그인 디렉토리가 필요합니다. 플러그인 디렉토리가 없다면 프로젝트 파일(.uproject)나 Content 폴더와 같은 위치이에 Plugins 디렉토리를 만들면 됩니다. 프로젝트 이름이 FooBar 라면 FooBar/Plugins/UnrealEnginePython 라는 경로를 갖게 됩니다.
+
 
 Open your project and go to the Edit/Plugins menu. Go to the bottom and under "Project/Scripting Languages" enable UnrealEnginePython.
+프로젝트를 열고, 편집 > 플러그인 메뉴로 이동합니다. 플러그인 다이얼로그 하단에 "프로젝트 > Scripting Languages" 에서 UnrealEnginePython 을 활성화시켜주세요.
 
 Restart your project and you should see the PythonConsole under the "Window/Developer Tools" menu
+프로젝트를 재시작하면 "윈도우 > 개발자 도구" 메뉴에서 파이썬 콘솔을 찾으실 수 있을 겁니다.
 
 Binary releases are mainly useful for editor scripting, if you want to package your project for distribution and you need the python runtime, you need a source release (see below).
+바이너리 릴리즈는 주로 에디터 스크립팅을 하는데 유용합니다. 배포용 패키지에서 파이썬 런타임이 필요하다면 아래 나오는 소스 릴리즈를 사용하셔야 합니다.
 
 If instead, you want to package your project without python, just remember to change the UnrealEnginePython.uplugin to have this line: https://github.com/20tab/UnrealEnginePython/blob/master/UnrealEnginePython.uplugin#L20 set as "Editor" instead of "Runtime"
+대신 파이썬 없이 프로젝트를 패키지하려면 UnrealEnginePython.uplugin 에서 Runtime 대신 Editor 로 설정해주셔야 합니다.
 
-# Installation from sources on MacOSX
+# Installation from sources on MacOSX (macOS 소스 설치)
 
 * install the latest official python distribution from python.org (the installation will end in the "/Library/Frameworks/Python.framework/Versions/X.Y" directory).
+* python.org 에서 최신 공식 파이써 배포판을 설치 합니다. (설치 경로는 "/Library/Frameworks/Python.framework/Versions/X.Y" 디렉토리 형태 입니다.) 
 * create a new unreal engine blank c++ project (NOT a blueprint one, otherwise XCode will not be initialized)
+* 새로운 언리얼 엔진 C++ 프로젝트를 생성합니다. (블루프린트 프로젝트는 Xcode 를 초기화시키지 않으므로 사용할 수 없습니다. )
 * create a Plugins directory in the project directory
+* 프로젝트에 Plugins/ 디렉토리를 생성합니다.
 * move to the Plugins directory and clone the plugin repository
+* Plugins 디렉토리로 이동해 플러그인 저장소를 클론 합니다. 
 
 
 ```sh
@@ -111,31 +161,41 @@ git clone https://github.com/20tab/UnrealEnginePython
 ```
 
 * restart the editor and a popup should appear asking your for confirmation of the build of the plugin.
+* 에디터를 재실행하고 팝업되는 플러그인 빌드 확인 여부에 답변합니다.
 * Once the plugin is built, go to the output log console and filter for 'Python'. You should see the Python VM banner.
+* 플러그인 빌드가 끝나고 출력창 로그 콘솔 'Python` 필터로 이동하면 파이썬 VM 배너를 볼 수 있습니다.
 
 The build procedure will try to automatically discover python installations. If you need custom paths, just edit here:
 
 https://github.com/20tab/UnrealEnginePython/blob/master/Source/UnrealEnginePython/UnrealEnginePython.Build.cs#L10
 
-Upgrading on MacOSX
+Upgrading on MacOSX (macOS 플러그인 업그레이드)
 -------------------
 
 To upgrade to the latest development version of UnrealEnginePython:
+언리얼 엔진 파이썬 최신 개발 버전으로 업그레이드 하는 방법
+
 * move to the Plugins directory in the project directory and use git pull
+* 프로젝트 내 Plugins 디렉토리로 이동해 git pull 을 사용 합니다.
 
 ```sh
 git pull
 ```
 
 * move to UnrealEnginePython/Binaries/Mac from the Plugin directory
+* 플러그인 디렉토리내 UnrealEnginePython/Binaries/Mac 으로 이동합니다.
+
 * remove the plugin libraries to warn UnrealEngine to recompile the plugin
+* 언리얼 엔진이 플러그인을 재컴파일 하도록 플러그인 라이브러리를 삭제합니다.
 
 ```sh
 rm *.dylib
 ```
 
 * restart the editor and a popup should appear asking your for confirmation of the build of the plugin.
+* 에디터를 재실행하고 팝업되는 플러그인 빌드 확인 여부에 답변합니다.
 * Once the plugin is built, go to the output log console and filter for 'Python'. You should see the Python VM banner.
+* 플러그인 빌드가 끝나고 출력창 로그 콘솔 'Python` 필터로 이동하면 파이썬 VM 배너를 볼 수 있습니다.
 
 Installation from sources On Linux (64 bit)
 -------------------------------------------
@@ -165,18 +225,21 @@ Just remove the .so files in Plugins/UnrealEnginePython/Binaries/Linux and pull 
 
 At the next run the build procedure wil be started again.
 
-Android Deployment
+Android Deployment (안드로이드 개발)
 ------------------
 
 Check https://github.com/20tab/UnrealEnginePython/blob/master/docs/Android.md
+안드로이드 문서를 참고 해주세요.
 
-# Installation on other platforms
+# Installation on other platforms (기타 플랫폼 설치)
 
 Currently only Windows, MacOSX, Linux and Android are supported.
+현재는 Windows, macOS, Linux, Android 만 지원합니다.
 
-# Using Python with Unreal Engine (finally)
+# Using Python with Unreal Engine (finally) 언리얼 엔진에서 파이썬 사용하기
 
 If your objective is to script the editor, you can directly jump to
+에디터 스크립팅이 목적일 경우 아래 문서들을 참고해주세요.
 
 https://github.com/20tab/UnrealEnginePython/tree/master/docs
 
@@ -185,30 +248,39 @@ and
 https://github.com/20tab/UnrealEnginePython/tree/master/examples
 
 The first directory contains the official documentation for specific areas, while the second one is a collection of python scripts doing any sort of 'magic' with your project ;)
+첫번째 디렉토리는 공식 문서이고, 두번째 디렉토리는 프로젝트에 유용한 파이썬 스크립트 모음입니다.
 
-Creating a new blueprint class managed by python
+Creating a new blueprint class managed by python (파이썬으로 관리되는 블루프린트 만들기)
 ------------------------------------------------
 
 We are going to create a new Actor based on python (instead of C++ or blueprints)
+(C++ 이나 블루프린트 대신)파이썬 기반에 액터를 생성해 보도록 하겠습니다.
 
 This is the "gentle" approach, using a 'proxy' python class to speak with the UE4 api. Once you get familiar with the system, you can
 go further and start working withe native subclassing api (https://github.com/20tab/UnrealEnginePython/blob/master/docs/Subclassing_API.md) 
+UE4 API 를 사용하기 위해 '프락시' 파이썬 클래스를 사용하는 "젠틀한" 방법입니다. 시스템에 대한 이해도가 높아지면  네이티브 서브 클래싱 API 를 사용하실 수 있게 될 것입니다.
 
 In the content browser click on 'add new' and choose 'blueprint class'
+컨텐츠 브라우저에서 'Add New'를 클릭한 다음 'Blueprint class'를 선택합니다.
 
 In the classes menu choose 'PyActor':
+클래스 리스트 메뉴에서 'PyActor'를 선택합니다.
 
 ![Alt text](screenshots/unreal_screenshot1.png?raw=true "Screenshot 1")
 
 You now have a new asset, give it a meaningful name, and double click on it to start configuring it in the blueprint editor
+새로운 애셋에 이름을 지어준 다음 더블 클릭해 블루프린트 에디터를 열어 설정을 시작합니다.
 
 ![Alt text](screenshots/unreal_screenshot2.png?raw=true "Screenshot 2")
 
 On the right (in the 'Details' tab) you will find the Python section.
+우측 ('디테일' 탭 내부)에서 파이썬 섹션을 찾을 수 있습니다.
 
 For now only 'Python Module' and 'Python Class' are meaningful.
+'Python Module' 과 'Python Class' 만 의미가 있습니다.
 
 Go to the Content directory of your project and create a directory named 'Scripts'. This is where all of your python modules will reside. With your favourite text editor create a new python module (like funnygameclasses.py), and define a new class into it:
+프로젝트 디렉토리로 이동해 'Scripts' 디렉토리를 생성합니다. 파이썬 모듈들을 모아 놓는 곳입니다. 선호하는 텍스트 에디터를 사용해 (funnygameclasses.py 같은) 파이썬 모듈을 하나 생성한 다음 아래처럼 작성합니다.
 
 ```py
 import unreal_engine as ue
@@ -233,14 +305,19 @@ class Hero:
 ```
 
 Now, go back to the blueprint editor and set 'funnygameclasses' in the 'Python Module' field, and 'Hero' in 'Python Class'
+블루프린트 에디터로 돌아가서 'Python Module' 필드에 'funnygameclasses', 'Python Class' 필드에 'Hero'라고 설정합니다.
 
 As you can see the actor will simply move over the z axis, but we need to give it some kind of visual representation to have a feedback in the scene. In the blueprint editor click on 'add component' and add some shape (a sphere, or a cube, or whatever you want). Save and Compile your blueprint.
+방금 만든 파이썬 모듈은 z 축위로 이동하는 액터이지만 움직임을 확인하기 위해서는 시각적인 표현을 붙여줘야 합니다. 블루프린트 에디터에서 'Add Component'를 클릭해 (Sphere 나 Cube 등) 원하는 모양을 축해줍니다. 블루프린트를 컴파일하고 저장하니다.
 
 Now you can drag the bluprint from the content browser to the scene and just click 'Play'.
+컨텐츠 브라우저의 블루프린트를 씬에 드래그 한 다음 'Play' 버튼을 클릭합니다.
 
 You should see your actor moving along the 'z' axis at a speed of 1 meter per second
+초당 1초의 속도로 z축을 따라 이동하는 액터를 보실 수 있을겁니다.
 
 By default a 'begin_play' and a 'tick' method are expected (they will be automatically taken into account if found). In addition to them an 'automagic' system for defining event is available:
+디폹트로 `begin_play` 와 `tick` 메소드가 (파이썬 클래스내 작성되어 있다면 자동으로) 사용 됩니다. 추가적으로 'automagic' 시스템을 사용할 수 있습니다.
 
 ```py
 def on_actor_begin_overlap(self, me, other_actor):
@@ -255,9 +332,11 @@ def on_actor_hit(self, me, other_actor, normal_impulse, hit_result):
 ...
 ```
 
-Basically for each method startwing with 'on_' the related delegate/event is automatically configured (if available).
+Basically for each method startwing with `on_` the related delegate/event is automatically configured (if available).
+기본적으로 `on_`으로 시작되는 메소드들은 (사용가능하다면) 자동으로 관련된 델리게이트나 이벤트로 설정됩니다.
 
 If you instead prefer to manually setup events, the following functions are exposed:
+이벤트들을 수동으로 설정하는 것을 선호한다면 아래 방식을 사용하시면 됩니다.
 
 ```py
 
@@ -282,26 +361,33 @@ class Ball:
 ```
 
 
-What is 'self.uobject' ?
+What is 'self.uobject' ? (self.uobject 란?)
 ------------------------
 
 To allow seamless Python integration, each UObject of the engine is automatically mapped to a special Python Object (ue_PyUObject).
+매끄러운 파이썬 통합을 위해 엔진내 UObject 들은 자동으로 특정 파이썬 오브젝트(`ue_PyUObject`)로 맵핑됩니다.
 
-Whenever you want to access a UObject from python, you effectively get a reference to a ue_PyUObject exposing (via its methods) the features of the UObject (properties, functions, ....)
+Whenever you want to access a UObject from python, you effectively get a reference to a ue_PyUObject exposing (via its methods) the features of the UObject (properties, functions, ....) 파이썬에서 UObject 접근시 (프로퍼티, 펑션 등) UObject 기능을 사용할 수 있는 `ue_PyUObject`레퍼런스를 얻을 수 있습니다.
 
 This special python object is cached into a c++ map in memory. (The key is the UObject pointer, the value is the ue_PyUObject pointer)
+이 특별한 파이썬 오브젝트는 메모리상 c++ map 으로 캐시되어 있습니다. (키는 UObject 포인터이고, 값은 `ue_PyUObject`포인터입니다.)
 
 To be more clear, a call to:
+좀 더 명확하게 설명하자면, 아래 같은 호출이 있을 경우
 
 ```py
 text_render_component = unreal_engine.find_class('TextRenderComponent')
 ```
 
 will internally search for the 'TextRenderComponent' class (via unreal c++ reflection) and when found will check if it is available in the cache, otherwise it will create a new ue_PyUObject object that will be placed in the cache.
+내부적으로 'TextRenderComponent' 클래스를 (언리얼 c++ 리플렉션을 통해) 검색합니다. 해당 클래스를 찾아내면 캐시로 사용 가능한지 체크하고 아니면 새로운 `ue_PyUObject` 를 생성해 캐쉬에 넣습니다.
 
 From the previous example the 'text_render_component' maintains a mapping to the UObject (well a UClass in this example).
+위 예제에서 `text_render_component` 는 UObjectd 의 맵핑(여기에서는 UClass)를 관리하게 됩니다.
 
 Pay attention: the python class you map to the PyActor (or PyPawn, PyCharacter or PyComponent), is not a ue_PyUObject. It is a classic python class that holds a reference (via the 'uobject' field) to the related ue_PyUObject mapped object. The best technical term to describe those classes is 'proxy'.
+주의: PyActor (또는 PyPawn, PyCharacter 또는 PyComponent)에 매핑하는 파이썬 클래스는 `ue_PyUObject`가 아닙니다. 이것은 클래식 파이썬 클래스로 `ue_PyUObject` 매핑된 객체에 대한 참조를 ('uobject'필드를 통해) 보유하고 있습니다. 전문적인 용어로는 '프록시'라고 합니다.
+
 
 Note about 'uobject' from now on
 ---------------------------------
@@ -395,7 +481,7 @@ means
 vec = self.uobject.call_function('GetActorRightForward')
 ```
 
-And more important (and handy) K2_ functions are automagically exposed too:
+And more important (and handy) `K2_` functions are automagically exposed too:
 
 ```py
 vec = self.uobject.GetActorLocation()
