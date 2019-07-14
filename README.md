@@ -389,38 +389,43 @@ Pay attention: the python class you map to the PyActor (or PyPawn, PyCharacter o
 주의: PyActor (또는 PyPawn, PyCharacter 또는 PyComponent)에 매핑하는 파이썬 클래스는 `ue_PyUObject`가 아닙니다. 이것은 클래식 파이썬 클래스로 `ue_PyUObject` 매핑된 객체에 대한 참조를 ('uobject'필드를 통해) 보유하고 있습니다. 전문적인 용어로는 '프록시'라고 합니다.
 
 
-Note about 'uobject' from now on
+Note about 'uobject' from now on (이후 등장하는 'uobject' 에 대한 참고 사항)
 ---------------------------------
 
 In the following lines, whenever you find a reference to 'uobject' it is meant as a ue_PyUObject object.
+이후 등장하는 'uobject' 는 `ue_PyUObject` 객체를 의미합니다.
 
-Adding a python component to an Actor
+Adding a python component to an Actor (액터에 파이썬 컴포넌트 추가하기)
 -------------------------------------
 
 This works in the same way as the PyActor class, but it is, well, a component. You can attach it (search for the 'Python' component) to any actor.
+PyActor 클래스와 비슷합니다. 단지 컴포넌트라는 차이만 있을 뿐입니다. 어떤 액터라도 'Python' 컴포넌트를 검색해 붙일 수 있습니다.
 
 Remember that for components, the self.uobject field point to the component itself, not the actor.
+컴포넌트에서 self.uobject 는 액터가 아니라 컴포넌트 자체를 말합니다.
 
 To access the actor you can use:
+액터에 접근하는 방법입니다.
 
 ```py
 actor = self.uobject.get_owner()
 ```
 
 The following example implements the third person official blueprint as a python component:
+다음 에제는 3 인칭 공식 블루프린트를 파이썬으로 구현한 것입니다.
 
 ```py
 class Player:
     
     def begin_play(self):
-        # get a reference to the owing pawn (a character)
+        # get a reference to the owing pawn (a character) 자기 폰 (캐릭터)에 대한 레퍼런스 얻음
         self.pawn = self.uobject.get_owner()
 
-        # the following two values were originally implemented as blueprint variable
+        # the following two values were originally implemented as blueprint variable 아래 2가지 값은 원래 블루프린트 변수로 구현되었음
         self.base_turn_rate = 45.0
         self.base_look_up_rate = 45.0
 
-        # bind axis events
+        # bind axis events 축 이벤트 연동
         self.pawn.bind_axis('TurnRate', self.turn)
         self.pawn.bind_axis('LookUpRate', self.look_up)
         self.pawn.bind_axis('Turn', self.pawn.add_controller_yaw_input)
@@ -429,7 +434,7 @@ class Player:
         self.pawn.bind_axis('MoveForward', self.move_forward)
         self.pawn.bind_axis('MoveRight', self.move_right)
 
-        # bind actions
+        # bind actions 액션 연동
         self.pawn.bind_action('Jump', ue.IE_PRESSED, self.pawn.jump)
         self.pawn.bind_action('Jump', ue.IE_RELEASED, self.pawn.stop_jumping)
 
@@ -452,80 +457,96 @@ class Player:
         self.pawn.add_movement_input(right, axis_value)
 ```
 
-Native methods VS reflection
+Native methods VS reflection 네이티브 메소드 vs 리플렉션
 ----------------------------
 
 By default the UObject class defines __getattr__ and __setattr__ as wrappers for unreal properties and functions.
+기본적으로 UObject 클래스는 언리얼 프로퍼티와 펑션을 `__getattr__` 과 `__setattr__` 로 랩핑 합니다. 
 
 This means that calling:
+이런 접근은
 
 ```py
 self.uobject.bCanBeDamaged = True
 ```
 
 it is the same as
+아래와 동일합니다.
 
 ```py
 self.uobject.set_property('bCanBeDamaged', True)
 ```
 
 As well as function calls:
+함수 호출은
 
 ```py
 vec = self.uobject.GetActorRightForward()
 ```
 
 means
+아래처럼 처리됩니다.
 
 ```py
 vec = self.uobject.call_function('GetActorRightForward')
 ```
 
 And more important (and handy) `K2_` functions are automagically exposed too:
+그리고 더 중요한 (그리고 편리한) `K2_` 함수는 자동으로 노출됩니다.
 
 ```py
 vec = self.uobject.GetActorLocation()
 ```
 
 is equal to:
+위와 같은 호출은 아래와 동일합니다.
 
 ```py
 vec = self.uobject.call_function('K2_GetActorLocation')
 ```
 
 Obviously you can combine methods/properties:
+당연히 메소드/속성은 결합해서 사용할 수 있습니다.
 
 ```py
 self.uobject.CharacterMovement.MaxWalkSpeed = 600.0
 ```
 
 Albeit the system allows for full unreal api usage, reflection is slower than native methods.
+모든 언리얼 API 을 지원하는 시스템이긴 하지만, 리플렉션은 네이티브 메소드 호출보다는 느립니다.
 
 Try to use native methods whenever possible, and open pull request whenever you think a function should be exposed as native methods.
+가능하면 네이티브 메소드를 사용하는 것을 추천합니다. 네이티브 메소드로 노출시켜야 한다고 생각한다면 pull request 부탁드립니다.
 
 So
+즉,
 
 ```py
 vec = self.uobject.get_actor_location()
 ```
 
 is way faster than
+위 방식은 아래 방식보다 빠릅니다.
 
 ```py
 vec = self.uobject.GetActorLocation()
 ```
 
 Reflection based functions are those in camelcase (or with the first capital letter). Native functions instead follow the python style, with lower case, underscore-as-separator function names.
+르플레이션 기반 펑션들은 camelCase (혹은 PascalCase)를 사용니다. 네이티브 펑션들은 파이썬 스타일(`snake_case`)를 따릅니다.
 
 Note that, in editor builds, when you change the property of an archetype (included ClassDefaultObject) via __setattr__ all of the archtype instances will be updated too.
+참고로 에디터 빌드에서는 (ClassDefaultObject 를 포함한) archtype 프로퍼티를 변경하면 `__setattr__`을 통해 모든 archtype 인스턴스들이 업데이트 됩니다.
 
 To be more clear:
+좀 더 명확하게 표현하자면
 
 ```python
 your_blueprint.GeneratedClass.get_cdo().CharacterMovement.MaxWalkSpeed = 600.0
 ```
 
 is a super shortcut for:
+위 구문은 아래 구문의 단축 형태입니다.
 
 ```python
 your_blueprint.GeneratedClass.get_cdo().CharacterMovement.pre_edit_change('MaxWalkSpeed')
@@ -538,10 +559,11 @@ for instance in your_blueprint.GeneratedClass.get_cdo().CharacterMovement.get_ar
 ```
 
 
-The automagic UClass, UStruct and UEnums mappers
+The automagic UClass, UStruct and UEnums mappers 자동 마법 UClass, UStruct, UEnum 맵퍼들 
 ------------------------------------------------
 
 Instead of doing a gazilion of unreal_engine.find_class(name) calls, the plugin adds three 'magic' modules called unreal_engine.classes, unreal_engine.structs and unreal_engine.enums. They allows to import unreal classes/structs/enums like python classes:
+`unreal_engine.find_class(name)` 귀찮음 방지를 위해, 플러그인에서는 3 가지 '마법같은' 모듈들(`unreal_engine.classes`, `unreal_engine.structs`, `unreal_engine.enums`)을 준비했습니다. 이들은 언리얼 클래스/구조체/열거형을 파이썬으로 임포트해줍니다.
 
 ```py
 from unreal_engine.classes import ActorComponent, ForceFeedbackEffect, KismetSystemLibrary
@@ -558,8 +580,10 @@ name = KismetSystemLibrary.GetObjectName(self.actor)
 ```
 
 the last example, shows another magic feature: static classes function calls. Obviously in this specific case using self.actor.get_name() would have been the best approach, but this feature allows you to access your blueprint function libraries too.
+마지막 예제에서는 또 다른 마법같은 기능: 정적 클래스 펑션 호출을 보여줍니다. 이러한 상황에서는 `self.actor.get_name()`을 사용하는 것이 가장 좋은 접근 방식이겠지만, 이 기능을 사용하면 블루프린트 라이브러리에 접근할 수 있습니다.
 
 Another example for adding a widget:
+위젯을 추가하는 또 다른 예제입니다.
 
 ```py
 from unreal_engine.classes import WidgetBlueprintLibrary
@@ -570,6 +594,7 @@ class PythonFunnyActor:
 ```
 
 And another complex example using enums, keyword arguments and output values (output values are appended after the return value):
+그리고 열거형과 키워드 인자, (리턴 값 뒤에 추가되는) 출력 값을 사용하는 예제입니다.
 
 ```py
 
@@ -586,6 +611,7 @@ if is_hitting_something:
 ```
 
 To create a new struct instance you can do:
+새로운 구조체 인스턴스를 만드는 방법입니다.
 
 ```python
 from unreal_engine.structs import TerrificStruct
@@ -594,6 +620,7 @@ ts = TerrificStruct()
 ```
 
 or (to initialize some of its fields)
+혹은 (몇가지 필드를 초기화 하는 예제입니다)
 
 ```python
 from unreal_engine.structs import TerrificStruct
@@ -602,58 +629,73 @@ ts = TerrificStruct(Foo='Bar', Test=17.22)
 ```
 
 To access the fields of a struct just call the fields() method.
+`fields()` 메소드를 호출해서 구조체 필드에 접근할 수 있습니다.
 
 A good example of struct usage is available here: https://github.com/20tab/UnrealEnginePython/blob/master/docs/Settings.md
-
+구조체 활용 예제입니다.
 
 More details here: https://github.com/20tab/UnrealEnginePython/blob/master/docs/MemoryManagement.md
+자세한 내용은 여기서 볼 수 있습니다.
 
-The ue_site.py file
+The ue_site.py file `ue_site.py` 파일
 -------------------
 
 On Editor/Engine start, the ue_site module is tried for import. You should place initialization code there. If the module cannot be imported, you will get a (harmful) message in the logs.
+에디터나 엔진 시작시 `ue_site` 모듈을 임포트하게 됩니다. 여기에 초기화 코드들을 넣어두면 됩니다. 만약 해당 모듈을 임포트할 수 없으며 로그 창에 (에러) 메시지가 나오게 됩니다.
 
-PyPawn
+PyPawn 
 ------
 
 This works like PyActor, but this time you generate a new Pawn class (that you can posses with a controller)
+PyActor 비슷하지만 새로운 Pawn 클래스를 생성합니다. (컨트롤러를 통해 제어할 수 있습니다.)
 
 
-The 'World' concept
+The 'World' concept '월드' 컨셉
 -------------------
 
 Every actor is mapped to a world (UWorld in c++). Generally when you play on a Level your objects all live in the same world, but at the same time there could be multiple worlds (for example while testing in the editor there is a world for the editor and one for the simulation)
+모든 액터는 월드(C++ 에서 이야기하는 UWorld)에 맵핑됩니다. 일반적으로 레벨을 플레이할 때 오브젝트들은 같은 월드상 존재합니다. 동시에 여러 세계가 존재할 수도 있습니다. (예를 들어 에디터를 테스트하는 동안 에디터용 월드와 시뮬레이션용 월드가 존재하게 됩니다.)
 
 While it is pretty rare to reference other worlds, you may need to compare the world of two uobject's (for example you may have a reference in your python module to a uobject of a hidden world and you want to check if you need to use it).
+다른 월드를 참조하는 일은 극히 드문일이긴 하지만, 간혹 다른 월드에 있는 오브젝트를 비교해야할 경우가 있습ㄴ다. (에를 들어 파이썬 모듈에서 숨겨진 월드에 있는 객체를 참조해 사용 가능한지 체크해야할 수 있습니다.)
 
 The uobject.get_world() function returns a uobject representing the world (the C++ UWorld class)
+`uobject.get_world()` 펑션은 오브젝트가 존재하는 월드(C++ 의 UWorld 클래스)를 리턴해줍니다.
 
 The uobject api
 ---------------
 
 Each uobject represent a UObject class of the Engine. This C++ class is basically the root of all the other classes (Actors, Pawns, components, properties ...). Thanks to Unreal Engine reflection system we do not need to implement a python class for each unreal engine class, but for performance reason we expose the most common methods. The uobject system checks for the type of the mapped C++ UObject and will call the method only if it is safe to call it.
+각 오브젝트는 엔진의 UObject 클래스를 나타냅니다. 기본적으로 이 C++ 클래스는 다른 모든 클래스의 부모 클래스입니다. (액터, 폰, 컴포넌트, 프로퍼티, ...) 언리얼 엔진의 리플렉션 시스템 덕분에 각 언리얼 클래스들을 파이썬으로 구현할 필요는 없습니다. 하지만 성능상의 이유로 자주 사용되는 메소드들은 직접 노출시켜야 합니다. uobject 시스템은 맵핑된 C++ UObject 의 타입을 체크해 안전하게 호출이 가능한 경우만 해당 메소드를 호출합니다.
 
 Sometime methods are implemented for automatically getting the right object. As an example get_actor_location() when called over a component will automatically retrieve the related actor and will call C++ AActor::GetActorLocation() method over it.
-
+때때로 정확한 오브젝트를 자동으로 얻어내기 위해 구현된 메소드들이 있습니다. 예를 들어 `get_actor_location()`은 컴포넌트상 호출될 때 자동으로 관련된 액터를 찾은 다음 C++ `AActor::GetActorLocation()` 메소드를 호출해줍니다.
 When this automagic approach is too risky, the method will check for the uobject type and will raise an exception in the case of inconsistencies.
+이런 자동화된 마법 접근 방식은 위험하다고 판단될 때 uobject 의 타입을 체크해 일치하지않을 경우 예외를 발생시키게 됩니다.
 
 Remember, there is no need to implement every single engine class method, the reflection system is powerful enough to be governed only via properties and function calls (check the uobject call() method)
+모든 엔진 클래스 메소드를 구현할 필요는 없습니다. 리플렉션 시스템은 프로퍼티와 펑션 호출을 통해서만 제어할 수 있을 정도로 매우 강력합니다. (uobject call() 메소드를 확인해보세요)
 
 Most-used methods are implemented directly as uobject methods for performance reasons.
+가장 빈번하게 사용되는 메소드는 성능상의 이슈로 uobject 메소드로 직접 구현되었습니다.
 
 You can get the the list of uobject api methods here: https://github.com/20tab/UnrealEnginePython/blob/master/docs/uobject_API.md
+uobject API 메서드 목록은 다음 링크에서 찾아보실 수 있습니다.
 
-Automatic module reloading (Editor only)
+Automatic module reloading (Editor only) 자동 모듈 리로딩 (에디터 전용)
 ----------------------------------------
 
 When in the editor, you can change the code of your modules mapped to proxies without restarting the project. The editor will reload the module every time a PyActor, PyPawn or PythonComponent is instantiated. This is obviously not the best approach. In the future we would like to implement timestamp monitoring on the file to reload only when needed.
+에디터에서는 프로젝트 재시작없이도 프락시에 맵핑된 모듈 코드들을 수정할 수 있습니다. 에디터에서는 PyActor, PyPawn, PythonComponet 가 인스턴스될 때마다 모듈을 재로드합니다. 이것이 매우 좋은 방법은 아니기 때문에 추후에 필요할 때만 리로드하기 위해 타임 스탬프를 통한 모니터링을 구현하려고 합니다.
 
-Primitives and Math functions
+Primitives and Math functions 프리미티브와 수학 펑션들
 -----------------------------
 
 The plugin exposes FVector, FRotator, FQuat, FColor, FHitResult and a bunch of the internal handles.
+플러그인에서는 FVector, FRotator, FQuat, FColor, FHitResult 및 내부 핸들들을 제공합니다.
 
 Where meaningful, math operations are exposed:
+수학 처리 예제입니다
 
 
 ```py
@@ -665,19 +707,19 @@ class ActorGoingUp:
         self.speed = 100
     
     def tick(self, delta_time):
-        # get the up vector
+        # get the up vector 업 벡터 얻기
         up = self.uobject.get_up_vector()
-        # get current position
+        # get current position 현재 위치 얻기
         position = self.uobject.get_actor_location()
-        # build a direction vector based on speed
+        # build a direction vector based on speed 속력 기반 방향 벡터 준비
         up_amount = up * self.speed * delta_time)
-        # sum the direction to the position
+        # sum the direction to the position 위치에 방향 합산
         position += up_amount
-        # set the new position
+        # set the new position 새로운 위치 설정
         self.uobject.set_actor_location(new_position)
 ```
 
-Referencing objects
+Referencing objects 오브젝트 참조
 -------------------
 
 You can use find_class(), find_struct() and find_object() functions to reference already loaded classes/objects.
