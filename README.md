@@ -723,8 +723,11 @@ Referencing objects 오브젝트 참조
 -------------------
 
 You can use find_class(), find_struct() and find_object() functions to reference already loaded classes/objects.
+`find_class(), find_struct(), find_object()` 펑션들을 사용해 이미 로드된 클래스나 오브젝트들을 레퍼런스 할 수 있습니다.
 
 If you need to reference assets (still) not loaded in the engine you can use load_struct(), load_class() or load_object():
+엔진에 아직 로드되지 않은 애셋이라면 `load_class(), load_struct(), load_object()`을 통해 로드해서 레퍼런스 할 수 있습니다.
+
 
 ```py
 a_struct_data = ue.load_struct('/Game/Data')
@@ -732,6 +735,7 @@ ue.log(a_struct_data.as_dict())
 ```
 
 or to find a specific asset:
+특정 애셋을 찾아 볼 수도 있습니다.
 
 ```py
 texture_class = ue.find_class('Texture2D')
@@ -739,25 +743,29 @@ a_specific_texture = ue.load_object(texture_class, '/Game/Textures/logo2')
 ```
 
 More infos about dealing with assets are available here: https://github.com/20tab/UnrealEnginePython/blob/master/docs/ManagingAssets.md
+애셋을 다루는 자세한 정보는 다음 링크에서 확인할 수 있습니다.
 
-The as_dict() method
+The as_dict() method `as_dict()` 메소드
 --------------------
 
 This special method can be called on any uobject: it will attempt to serialize it to a python dictionary
+`as_dict()`는 어떤 오브젝트에서든 호출할 수 있는 특이한 메소드로 파이썬 사전 형태로 시리얼라이즈할 수 있습니다.
 
 
-
-Blueprints integration
+Blueprints integration 블루프린트 통합
 ----------------------
 
 You can call blueprints functions (or custom events) via the .call() and .call_function() methods:
+`.call()` 이나 `.call_function()`메소드를 통해 블루프린트 펑션(이나 커스텀 이벤트)를 호출 할 수 있습니다.
 
 ```py
 your_funny_blueprint_object.call('AFunctionOrACustomEvent with_a_arg')
 ```
 
 Whenever you need to reference external object, avoid using find_object() and similar. Instead add a public variable in your blueprint
-pointing to the specific object. You can then reference this object easily getting the property value:
+pointing to the specific object. You can then reference this object easily getting the property value
+외부 객체를 레퍼런할스 할때마다 `find_object()`류를 사용하는 것은 피하는 것이 좋습니다. 대신 특정 오브젝트를 가리키는 퍼블릭 변수를 프린트에 추가해두면
+프로퍼티 값을 통해 오브젝트를 쉽게 레퍼런스할 수 있습니다.
 
 ```py
 the_other_object = self.uobject.get_property('target')
@@ -765,9 +773,10 @@ the_other_object.set_actor_location(0, 0, 0)
 ```
 
 .call_function() is more advanced, as it allows for return values and python args:
+`.call_function()`은 리턴값과 파이썬 인자를 지원하므로 좀 더 쓸만합니다.
 
 ```py
-# an example of moving an object z with curves:
+# an example of moving an object z with curves: 곡선 형태로 오브젝트 z 를 움직이는 예제
 class Curver:
     def begin_play(self):
         self.curve = self.uobject.get_owner().get_property('curve')
@@ -780,62 +789,83 @@ class Curver:
 
 ```
 
-Events
+Events 이벤트
 ------
 
 You can easily bind events (as seen before) with the bind_event function
+`bind_event()` 펑션을 사용하면 (에전에 보았듯이) 이벤트를 손쉽게 바인딩할 수 있습니다.
 
 ```py
 self.uobject.bind_event('OnActorBeginOverlap', a_funny_callback)
 ```
 
 You can obviously bind to Event Dispatchers too.
+이벤트 디스패처도 당연히 바인딩할 수 있습니다.
 
 Triggering events is basically like calling functions, self.uobject.call('OnActorBeginOverlap') will be more than enough.
+이벤트 트리거는 기본적으로 펑션처럼 호출됩니다. `self.uobject.call('OnActorBeginOverlap')`같은 형태입니다.
 
 If you want to map events from a blueprint to a python function, the best thing to do is using the 'python call' blueprint functions exposed by the various plugin classes:
+블루프린트에서 파이썬 펑션으로 이벤트를 맵핑하는 가장 좋은 방법은 '파이썬 호출' 블루프린트 함수를 사용하는 것입니다. 다양한 플러그인 클래스들을 노출시킬 수 있습니다.
 
 ![Alt text](screenshots/unreal_screenshot3.png?raw=true "Screenshot 3")
 
-Plugin Configuration
+Plugin Configuration 플러그인 설정
 --------------------
 
 You can tune your python environment adding a [Python] stanza to the Config/DefaultEngine.ini file.
+`Config/DefaultEngine.ini` 파일 [Python] 스탠자를 추가해 파이썬 환경을 조정할 수 있습니다.
 
 The following parameters are supported:
+지원되는 파라미터는 다음과 같습니다.
 
 * `Home`: set the path of the python installation, useful for forcing the python vm to search modules in a specific directory (like old-style virtualenvs)
+* `Home`: 파이썬 설치 경로로 특정 디렉토리내 모듈을 검색하도록 파이썬 VM 을 강제하는데 유용합니다. (구 virtualenvs 방식과 비슷합니다.)
 * `RelativeHome`: like Home but relative to the /Content directory
+* `RelativeHome`: Home 과 비슷하지만 /Content 디렉토리 기준 상대 경로입니다.
 * `ProgramName`: set the python program name path
+* `ProgramName`: 파이썬 프로그램 이름 경로 설정
 * `RelativeProgramName`: like ProgramName, but the path is relative to the /Content directory
+* `RelativeProgramName`: ProgramName 과 비슷하지만 /Content 디렉토리 기준 상대 경로입니다.
 * `ScriptsPath`: change the default path on where Unreal Engine searches for python scripts
+* `ScriptsPath`: 언리얼 엔진이 파이썬 스크립트를 검색하는 디폴트 경로 변경시 사용 
 * `RelativeScriptsPath`: like ScriptsPath, but relative to the /Content directory
+* `RelativeScriptsPath`: ScriptsPath 과 비슷하지만 /Content 디렉토리 기준 상대 경로입니다.
 * `AdditionalModulesPath`: add the specified directory to sys.path
+* `AdditionalModulesPath`: sys.path 에 특정 디렉토리 추가 
 * `RelativeAdditionalModulesPath`: like AdditionalModulesPath, but the path is relative to the /Content directory
+* `RelativeAdditionalModulesPath`: AdditionalModulesPath 와 비슷하지만 /Content 디렉토리 기준 상대 경로입니다.
 * `ZipPath`: allow to specify a .zip file that is added to sys.path
+* `ZipPath`: sys.path 에 특정 zip 파일 추가
 * `RelativeZipPath`: like ZipPath, but the path is relative to the /Content directory
+* `RelativeZipPath`: ZipPath 와 비슷하지만 /Content 디렉토리 기준 상대 경로입니다.
 * `ImportModules: comma/space/semicolon separated list of modules to import on startup (after ue_site)
+* `ImportModules: 시작시 (`ue_site` 이후) 임포트하는 모듈 리스트로 콤마, 스페이스, 세미콜론으로 구분
 
 Example:
+예제:
 
 ```ini
 [Python]
 Home = C:/FooBar/Python36
 ```
 
-Packaging
+Packaging 패키징
 ---------
 
 When you package your projects, remember to include the libpython (dll or dylib or .so based on your operating system) in the binaries folder and the Scripts directory (if you do not want to force the user to have python installed in its system). For Windows system you can use the embedded distributions available in the official python.org site. Just uncompress the zip in the plugin binary folder (at the same level of UnrealEnginePython.dll)
+프로젝트 패키징시에는 (사용자 시스템에 파이썬 설치를 강요하는 걸 원치 않는다면) libpython (운영체제에 따라 .dll, .dylib, .so 등)이 포함된 바이너리 폴더와 스크립트 디렉토리를 포함시켜야 합니다. 윈도우 시스템의 경우 공식 python.org 사이트에서 제공되는 임베디드 배포판을 사용할 수 있습니다. (UnrealEnginePython.dll 과 같은 위치인) 플러그인 바이너리 폴더에 zip 압축을 풀어주면 됩니다.
 
 If you do not want to distribute python sources, you can include only the ```__pycache__``` directory with the bytecode.
+파이썬 소스 배포를 원하지 않는다면 바이트 코드가 있는 ```__pycache__``` 디렉토리만 포함시켜도 됩니다.
 
 Do not forget to include python third party modules (if you use any of them in your project)
+(프로젝트에서 사용중인) 파이썬 써드 파티 모듈을 포함해야 한다는 점 잊지 마시길 바랍니다. 
 
-Quick Examples
+Quick Examples 쾌속 예제
 --------------
 
-This is a PyActor destroying itself whenever another actor overlap it. Remember to add a mesh component to it (like a sphere) and set its collision behaviour as 'OverlapAll'. This could be tested with the third person official template.
+This is a PyActor destroying itself whenever another actor overlap it. Remember to add a mesh component to it (like a sphere) and set its collision behaviour as 'OverlapAll'. This could be tested with the third person official template. 다른 액터에 겹칠때마다 스스로 파괴되는 PyActor 입니다. (구형 같은) 메쉬 컴포넌트를 추가하고 Collision Behaviour 를 'OverlapAll' 로 설정해야 한다는 점 기억해두시기 바랍니다. 공식 3 인칭 템플릿으로 테스트해 볼 수 있습니다.
 
 ```py
 class Ball:
@@ -848,28 +878,31 @@ class Ball:
 ```
 
 Now we create (at runtime !!!) a whole new PyActor:
+자 (런타임에!!!) PyActor 를 완전히 새롭게 작성해보겠습니다.
 
 ```python
 class SuperHero:
     def begin_play(self):
-        # spawn a new PyActor
+        # spawn a new PyActor 새로운 PyActor 스폰
         new_actor = self.uobject.actor_spawn(ue.find_class('PyActor'), Fvector(0, 0, 0),FRotator(0, 0, 90))
-        # add a sphere component as the root one
+        # add a sphere component as the root one 루트에 구형 컴포넌트 추가
         static_mesh = new_actor.add_actor_root_component(ue.find_class('StaticMeshComponent'), 'SphereMesh')
-        # set the mesh as the Sphere asset
+        # set the mesh as the Sphere asset 구형 애셋 메쉬 설정
         static_mesh.call('SetStaticMesh /Engine/EngineMeshes/Sphere.Sphere')
-        # set the python module
+        # set the python module 파이썬 모듈 설정
         new_actor.set_property('PythonModule', 'gameclasses')
-        # set the python class
+        # set the python class 파이썬 클래스 설정
         new_actor.set_property('PythonClass', 'Vertical')
 ```
 
 For more examples: https://github.com/20tab/UnrealEnginePython/tree/master/examples
+추가 예제는 다음 링크에서 보실 수 있습니다.
 
-Spawning Notes
+Spawning Notes 노트 스폰
 --------------
 
 Remember that only Actors can be spawned in a world, and that even the editor is a valid world:
+월드에는 오직 액터만 스폰될 수 있습니다. 에디터도 월드입니다.
 
 ```python
 import unreal_engine as ue
@@ -882,6 +915,7 @@ character000 = world.actor_spawn(Character, FVector(100, 100, 100), FRotator(0, 
 ```
 
 Remember that the Blueprint asset is not a valid actor by itself, you need to get the class generated by the blueprint:
+블루프린트 애셋 자체는 액터가 아니므로, 블루프린트로 생성된 클래스가 필요합니다.
 
 ```python
 import unreal_engine as ue
@@ -895,6 +929,7 @@ actor000 = world.actor_spawn(blueprint.GeneratedClass, FVector(0, 0, 0), FRotato
 ```
 
 otherwise you can directly reference the BlueprintGeneratedClass
+BlueprintGeneratedClass 레퍼런스를 직접 참조할 수도 있습니다.
 
 ```python
 import unreal_engine as ue
@@ -907,16 +942,19 @@ blueprint_actor = ue.load_object(BlueprintGeneratedClass, '/Game/TestBall.TestBa
 actor000 = world.actor_spawn(blueprint_actor, FVector(0, 0, 0), FRotator(0, 0, 0))
 ```
 
-The Python Editor
+The Python Editor 파이썬 에디터
 -----------------
 
 Starting from version 20170301 a handy editor has been added to the plugin:
+20170301 버전부터 플러그인에 간단한 에디터가 추가되었습니다.
 
 ![Alt text](screenshots/python_editor_screenshot001.png?raw=true "Python Editor Screenshot")
 
 It allows you to run, create, modify and delete scripts directly from the UE editor
+언리얼 에디터에서 스크립트 실행, 생성, 수정, 삭제등을 할 수 있습니다.
 
 The first pull request for the editor has been issued by https://github.com/sun5471 so many thanks to him ;)
+에디터에 첫 풀 리퀘스트는 sun5471 님이 많은 도움을 주셨습니다.
 
 Integration with Qt4/Qt5/PySide2
 --------------------------------
